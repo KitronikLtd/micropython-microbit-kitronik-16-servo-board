@@ -54,10 +54,6 @@ class KitronikServoBoard:
     SERVO_MULTIPLIER = 226
     SERVO_ZERO_OFFSET = 0x66
 
-    # a flag to allow us to initialise without explicitly
-    # calling the secret incantation
-    INITALISED = False
-
     class Servos:
         # nice big list of servos to use.
         # These represent register offsets in the PCA9865
@@ -88,7 +84,6 @@ class KitronikServoBoard:
     def trim_servo_multiplier(self, trim_value):
         if trim_value < 113:
             self.SERVO_MULTIPLIER = 113
-
         else:
             if trim_value > 226:
                 self.SERVO_MULTIPLIER = 226
@@ -104,7 +99,7 @@ class KitronikServoBoard:
             else:
                 self.SERVO_ZERO_OFFSET = trim_value
 
-    def _secret_incantation(self):
+    def __init__(self):
         # This secret incantation sets up the PCA9865 I2C driver chip to
         # be running at 50Hz pulse repetition, and then sets the 16 output
         # registers to 1.5mS - centre travel on the servos.
@@ -134,16 +129,10 @@ class KitronikServoBoard:
         buf[0] = self.MODE_1_REG
         buf[1] = 0x01
         i2c.write(self.BOARD_1, buf, False)
-        # set the initalised flag so we dont come in here again automatically
-        self.INITALISED = True
 
-    def servo_write(self, Servo: Servos, degrees):
-        # sets the requested servo to the reguested angle.
-        # if the PCA has not yet been setup calls the initialisation routine
+    def servo_write(self, Servo, degrees):
         # @param Servo Which servo to set
         # @param degrees the angle to set the servo to
-        if self.INITALISED is False:
-            self._secret_incantation(self)
         buf = bytearray(2)
         HighByte = False
         deg100 = degrees * 100
@@ -169,18 +158,16 @@ class KitronikServoBoard:
 #
 # Replace this code with your own
 
-theServoBoard = KitronikServoBoard
+theServoBoard = KitronikServoBoard()
 while True:
     if button_a.is_pressed() and button_b.is_pressed():
-        theServoBoard.servo_write(theServoBoard,
-                                  KitronikServoBoard.Servos.SERVO_1,
+        theServoBoard.servo_write(KitronikServoBoard.Servos.SERVO_1,
                                   90)
     elif button_a.is_pressed():
-        theServoBoard.servo_write(theServoBoard,
-                                  KitronikServoBoard.Servos.SERVO_1,
+        theServoBoard.servo_write(KitronikServoBoard.Servos.SERVO_1,
                                   0)
     elif button_b.is_pressed():
-        theServoBoard.servo_write(theServoBoard,
-                                  KitronikServoBoard.Servos.SERVO_1,
+        theServoBoard.servo_write(KitronikServoBoard.Servos.SERVO_1,
                                   180)
     sleep(100)
+
