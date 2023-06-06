@@ -112,7 +112,7 @@ class KitronikServoBoard:
         buf[0] = self.PRESCALE_REG
         buf[1] = 0x85
         i2c.write(self.BOARD_1, buf, False)
-        # Block write via the all leds register to set all of them to 90 deg
+        # Block write via the all leds register to set all of them to 0 deg
         buf[0] = 0xFA
         buf[1] = 0x00
         i2c.write(self.BOARD_1, buf, False)
