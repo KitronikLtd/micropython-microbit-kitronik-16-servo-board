@@ -110,7 +110,7 @@ class KitronikServoBoard:
         # Should really do a soft reset of the I2C chip here
         # First set the prescaler to 50 hz
         buf[0] = self.PRESCALE_REG
-        buf[1] = 0x85
+        buf[1] = 0x7D
         i2c.write(self.BOARD_1, buf, False)
         # Block write via the all leds register to set all of them to 0 deg
         buf[0] = 0xFA
